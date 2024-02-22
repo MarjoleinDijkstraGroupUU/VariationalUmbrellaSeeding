@@ -1,0 +1,38 @@
+#read_data	    tip4pice.dat
+
+# Needs to be here to get atom order correct with gather and scatter
+group           water type 1 2 
+group           O type 1
+group           H type 2
+
+
+# define interactions
+set             group O charge -1.1794
+set             group H charge 0.5897
+
+ # TODO: shouldn't cutoff be 9.0 Angstrom?
+pair_style      lj/cut/tip4p/long 1 2 1 1 0.1577 9.0
+pair_coeff      1 1 0.21084 3.1668
+pair_coeff      1 2 0.00000 0.0000
+pair_coeff      2 2 0.00000 0.0000
+
+kspace_style    pppm/tip4p 1.0e-5
+
+pair_modify     shift no
+pair_modify     tail yes
+
+bond_coeff      1 0.00 0.9572 
+angle_coeff     1 0.00 104.52
+
+special_bonds   lj/coul 0.0 0.0 0.5 angle no dihedral no
+
+
+# integrator
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes one 4000
+
+fix             shake all shake 0.00001 20 0 b 1 a 1
+#fix             shake all rattle 0.00001 20 0 b 1 a 1
+#fix            npt all npt temp 230 230 2000 iso 0.9869 0.9869 2000.1 dilate all
+fix             nve all nve  
+

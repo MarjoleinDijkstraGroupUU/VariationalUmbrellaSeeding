@@ -1,0 +1,32 @@
+# Pseudo hard spheres
+
+# Units and atom style
+units		lj
+atom_style	atomic
+
+# Needs to be here to get atom order correct with gather and scatter
+atom_modify     map array sort 0 0.0
+
+# Read
+read_data       wca.dat
+
+# Pair info
+pair_style      lj/cut 1.1225
+pair_modify     shift yes
+pair_coeff      * * 40.0 1.0
+
+# Neighbor list
+neighbor	    0.3 bin
+neigh_modify	every 2 delay 0 check yes
+
+#compute        q6 all orientorder/atom degrees 1 6 components 6 cutoff 1.5
+#compute        wolde all coord/atom orientorder q6 0.7
+#variable       solidlike atom 'c_wolde > 9.5'
+#compute        nsolid all reduce sum v_solidlike
+#thermo_style   custom step temp epair emol etotal press vol density c_nsolid
+#thermo         100
+
+# Integrator and initialization
+fix nve         all nve
+#run             0
+
