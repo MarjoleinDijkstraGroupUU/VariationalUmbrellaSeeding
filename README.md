@@ -1,13 +1,13 @@
 # Variational Umbrella Seeding
 by Willem Gispen, Jorge R. Espinosa, Eduardo Sanz, Carlos Vega, and Marjolein Dijkstra
 
-This code repository accompagnies our paper ["Variational Umbrella Seeding for Calculating Nucleation Barriers"](https://arxiv.org/abs/2402.13892).
+This code repository accompagnies our paper ["Variational Umbrella Seeding for Calculating Nucleation Barriers"](https://doi.org/10.1063/5.0204540) accepted for publication in the Journal of Chemical Physics.
 This code is also available from [github.com/MarjoleinDijkstraGroupUU](github.com/MarjoleinDijkstraGroupUU).
 
 ![](/vus-overview.svg)
 
 ## Abstract
-> In this work, we introduce Variational Umbrella Seeding, a novel technique for computing nucleation barriers. This new method, a refinement of the original seeding approach, is independent on the choice of order parameter for measuring the size of a nucleus. Consequently, it surpasses seeding in accuracy, and Umbrella Sampling in computational speed. We test the method extensively and demonstrate excellent accuracy for crystal nucleation of nearly hard spheres and of two distinct models of water: mW and TIP4P/ICE. This method can easily be extended to calculate nucleation barriers for homogeneous melting, condensation, and cavitation.
+> In this work, we introduce Variational Umbrella Seeding, a novel technique for computing nucleation barriers. This new method, a refinement of the original seeding approach, is far less sensitive to the choice of order parameter for measuring the size of a nucleus. Consequently, it surpasses seeding in accuracy, and Umbrella Sampling in computational speed. We test the method extensively and demonstrate excellent accuracy for crystal nucleation of nearly hard spheres and of two distinct models of water: mW and TIP4P/ICE. This method can easily be extended to calculate nucleation barriers for homogeneous melting, condensation, and cavitation.
 
 ## How to use this software
 
@@ -27,7 +27,7 @@ This code is also available from [github.com/MarjoleinDijkstraGroupUU](github.co
      * `python hmc_npt_bias.py -model mW -P 0.0 -T 215.1 -target_size 0 -integrator npt -n_steps 250 -dt 2.0 --rand_vel`
      * `python hmc_npt_bias.py -model mW -P 0.0 -T 215.1 -target_size 0 -integrator npt -n_steps 250 -dt 2.0 --no-rand_vel`
     
-    Please see the python script `hmc_npt_bias.py` for the precise meaning of the command line arguments. Essentially, this performs two simulations of a bulk mW liquid phase at 215.1K, one where the velocities are resampled after every 250 timesteps, and one where they are not resampled. 
+    Please see the python script `hmc_npt_bias.py` for the precise meaning of the command line arguments. Essentially, this performs two simulations of a bulk mW liquid phase at 215.1K, one where the velocities are resampled after every 250 timesteps, and one where they are not resampled. Generally, the command line arguments we used can be found in the `args.dat` files that are included with every simulation.
 
 3. **Seeding**
 
@@ -41,7 +41,7 @@ This code is also available from [github.com/MarjoleinDijkstraGroupUU](github.co
 
 4. **Umbrella Sampling**: Perform Umbrella Sampling simulations with hybrid Monte Carlo to obtain barrier segments
     
-    * Use the Jupyter notebook `scripts/notebooks/idealized-barrier.ipynb` to estimate reasonable bias widths for the bias potentials.
+    * Use the Jupyter notebook `scripts/notebooks/idealized-barrier.ipynb` to estimate reasonable bias widths for the bias potentials. Note that this notebook estimates bias widths, which can be converted into spring constants as $k = 1/(bias ~width)^2$.
 
     * Use the python script `python hmc_npt_bias.py` to perform the Umbrella Sampling simulations with hybrid Monte Carlo. 
         
@@ -59,7 +59,7 @@ This code is also available from [github.com/MarjoleinDijkstraGroupUU](github.co
 
     Use the Jupyter notebook `scripts/notebooks/fit-acnt.ipynb` to fit the barrier segments with adjusted classical nucleation theory (aCNT). This notebook plots the barrier and prints the height of the nucleation barrier.
     
-    Essentially, all this notebook really needs is histograms of nucleus size distributions of a few barrier segments. We have included this data in the `results` directory, so that you can try this notebook without performing additional hybrid Monte Carlo simulations. For optimal results, especially for the estimation of confidence intervals, make sure to estimate the correlation time of a simulation and subsample to get independent samples before you construct the nucleus size histogram.
+    Essentially, all this notebook really needs is histograms of nucleus size distributions of a few barrier segments. We have included this data in the `results` directory, so that you can try this notebook without performing additional hybrid Monte Carlo simulations. For optimal results, especially for the estimation of confidence intervals, make sure to estimate the correlation time of a simulation and subsample to get independent samples before you construct the nucleus size histogram. We have included the nucleus size histograms after subsampling, named `nucleus_size_hist_processed.csv`, as well as the nucleus size histograms without subsampling, named `nucleus_size_hist_full.csv`. To obtain the initial part of the barrier from the unbiased simulations, see the `nucleus_size_hist_processed.csv` files in the `n0` directories for each system. Here, a nucleus size of 0 refers to all liquidlike particles. To get the factor (N_n / N) from this file, divide the 'count' column by the total number of particles of all snapshots combined, which can be obtained by summing the 'count' column weighted with the nucleus size. To be precise, divide by (M_0 + M_1 + 2* M_2 + 3*M_3 + ...), where M_n refers to the 'count' column. These unbiased simulations use 2000, 4000, 6000, or 8000 particles/molecules per snapshot, depending on the system (see the `args.dat` files). Please see the `fit_g0` function in `fit-acnt.ipynb` script as an example of how to compute the initial part of the barrier.
 
 
 

@@ -1,6 +1,6 @@
 # %%
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 
 # %%
 import matplotlib.pyplot as plt
@@ -90,7 +90,10 @@ def fit_g0(params, windows, Ns, p_s, plot=True):
             Gu = -np.log(p_).values
 
             # subtract log(total number of particles)
-            Gu -= -np.log(p_[0] + p_[1] + 2*p_[2] + 3*p_[3] + 4*p_[4])
+            Ntot = p_[0]
+            for k in Nu:
+                Ntot += k * p_[k]
+            Gu -= -np.log(Ntot)
             break
 
     # fit g0 by glueing unbiased free-energy Gu to acnt fit
@@ -213,7 +216,7 @@ def get_data():
 
             # find bias width
             if n != 0:
-                args = pd.read_csv(f'{d1}/args.dat', delim_whitespace=True, header=None, names=['key', 'value'])
+                args = pd.read_csv(f'{d1}/args.dat', delim_whitespace=True, header=None, names=['key', 'value'], comment='#')
                 bias_width = float(args[args['key'] == 'bias_width']['value'])
             else:
                 bias_width = np.inf
@@ -221,16 +224,16 @@ def get_data():
             # read nucleus size distribution
             nucleus_size_hist_path = f'{d1}/nucleus_size_hist_processed.csv'
             if os.path.exists(nucleus_size_hist_path):
-                df1 = pd.read_csv(nucleus_size_hist_path)
+                df1 = pd.read_csv(nucleus_size_hist_path,)
             elif n == 0:
-                df1 = pd.read_csv(f'{d1}/{files[-1]}')
+                df1 = pd.read_csv(f'{d1}/{files[-1]}',)
                 files = files[len(files)//2:]
                 if len(files) > 1:
-                    df0 = pd.read_csv(f'{d1}/{files[0]}')
+                    df0 = pd.read_csv(f'{d1}/{files[0]}',)
                     df1['count'] -= df0['count']
             else:
                 # read nucleus size timeseries
-                thermo = pd.read_csv(f'{d1}/thermo.dat', delim_whitespace=True)
+                thermo = pd.read_csv(f'{d1}/thermo.dat', delim_whitespace=True, comment='#')
 
                 # estimate correlation length and subsample
                 observable = thermo['nucleus_size'].values
@@ -328,8 +331,8 @@ model, ys = 'wca', [6,7,8]
 plot = True
 confidence = False
 
-for integrator in ['npt','nve'][:1]:
-    for y in ys[:1]:
+for integrator in ['npt','nve'][:]:
+    for y in ys[:]:
         print(y)
         # get data
         d0, acnt.dmu = get_model(model, y)
@@ -338,7 +341,7 @@ for integrator in ['npt','nve'][:1]:
         # fit aCNT
         Nc, Gc, params = fit_acnt_mle(windows, Ns, p_s, plot=plot)
 
-        print(f'Supersaturation (|Δμ|):  {acnt.dmu:.2f} kT')
+        print(f'Supersaturation (|Δμ|):  {acnt.dmu:.3f} kT')
         print('aCNT fit parameters (g2, g1, g0):', params)
         print('Integrator:', integrator)
         print('Barrier height:', f'{Gc:.1f} kT')

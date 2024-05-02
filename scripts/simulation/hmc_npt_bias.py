@@ -566,22 +566,23 @@ for isweep in range(n_sweeps):
   #-------------------- Output --------------------#
 
   # Update histogram
-  if args.bias_width == np.inf and rank == 0 and ((isweep + 1) % freq_thermo == 0):
-    # If performing an unbiased simulation, count all nuclei in the system
-    nucleus_size_distribution = get_nucleus_size_distribution(cluster, solidlike)
-    nucleus_sizes, counts = np.unique(nucleus_size_distribution, return_counts=True)
-    # Add to histogram
-    for i, nucleus_size in enumerate(nucleus_sizes):
-        row = (hist['nucleus_size'] == nucleus_size)
-        hist.loc[row, ['count']] += counts[i]
-  else:
-    # Count only the largest nucleus size
-    row = (hist['nucleus_size'] == nucleus_size)
-    hist.loc[row, ['count']] += 1
+  if rank == 0 and ((isweep + 1) % freq_thermo == 0):
+    if args.bias_width == np.inf:
+      # If performing an unbiased simulation, count all nuclei in the system
+      nucleus_size_distribution = get_nucleus_size_distribution(cluster, solidlike)
+      nucleus_sizes, counts = np.unique(nucleus_size_distribution, return_counts=True)
+      # Add to histogram
+      for i, nucleus_size in enumerate(nucleus_sizes):
+          row = (hist['nucleus_size'] == nucleus_size)
+          hist.loc[row, ['count']] += counts[i]
+    else:
+      # Count only the largest nucleus size
+      row = (hist['nucleus_size'] == nucleus_size)
+      hist.loc[row, ['count']] += 1
 
-  # Write histogram to file
-  if ((isweep + 1) % freq_hist == 0) and rank == 0:
-    hist.to_csv(f'{dir_out}/nucleus_size_hist_step_{isweep+1}.csv', index=False)
+    # Write histogram to file
+    if ((isweep + 1) % freq_hist == 0):
+      hist.to_csv(f'{dir_out}/nucleus_size_hist_step_{isweep+1}.csv', index=False)
     
   # Write log file
   if (isweep + 1) % freq_thermo == 0:  # Write thermodynamic data and HMC statistics

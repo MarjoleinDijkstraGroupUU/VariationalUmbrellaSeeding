@@ -131,7 +131,7 @@ plt.savefig(f'../../results/figs/filion_hs-{portrait}.pdf', dpi=300, bbox_inches
 d0 = '../../results/lit/'
 files = ['melting-7.4', 'sanchez_2020', 'menzl_2016', 'auer-frenkel-p15_'] #'sharma_2018',
 labels = ['Melting - Gispen (2023)', 'Condensation - Sanchez-Burgos (2020)', 'Cavitation - Menzl (2016)', 'Freezing - Auer (2001)'] #'Anisotropic nucleus', 
-dmus = [0.15,0.0537/0.6811, 135/4.092, 0.34]
+dmus = [0.15, 0.0537/0.6811/0.785, 135/4.092, 0.34]
 rhos = [0.90,  0.6811, 1.0, 1.107]
 order = [3,0,1,2]
 files, labels, dmus, rhos = np.array(files)[order], np.array(labels)[order], np.array(dmus)[order], np.array(rhos)[order]
@@ -216,15 +216,15 @@ plt.savefig(f'../../results/figs/melting-condensation-barrier-{portrait}.pdf', d
 
 # %%
 params_npt = [
-    (4.32, -8.35, 13.46),
-    (3.92, -5.56, 10.51),
-    (3.64, -3.91, 9.39),
+    (4.31674569, -8.35197858, 13.78756874),
+    (3.92017799, -5.55710876, 10.78226729),
+    (3.63582302, -3.90718181, 9.51156173),
 ]
 
 params_nve = [
-    (4.31, -8.21, 13.22),
-    (3.90, -5.33, 10.21),
-    (3.50, -2.75, 7.99),
+    (4.31322813, -8.21119565, 13.55711875),
+    (3.89522346, -5.32554752, 10.5002057),
+    (3.50295785, -2.74665445,  8.26029919),
 ]
 
 # %%
@@ -234,7 +234,7 @@ acnt.rho_s = rho_s = 0.844
 fig, axs = plt.subplots(
     1,3, sharey=True,
     gridspec_kw={'width_ratios':[1,1,1],}, figsize=(4,3)) #150,175,200
-model, ys, fits_g0, skip_npt, skip_nve = 'wca', [6,7,8], 13.65, 50, 100
+model, ys, fits_g0, skip_npt, skip_nve = 'wca', [6,7,8], 10.0, 50, 100
 xmaxs = [200, 225, 250]
 
 for integrator in ['npt','nve'][:1]:
@@ -280,15 +280,15 @@ plt.savefig('../../results/figs/wca-barriers-npt-nve.pdf', dpi=300, bbox_inches=
 
 # %%
 params_npt = [
-    (0.62, 4.29, -3.47, 6.15),
-    (0.50, 3.95, -0.06, 2.22),
-    (0.38, 3.77, 2.69, -1.23),
+    (0.625, 4.29, -3.47, 7.54),
+    (0.498, 3.95, -0.06, 3.42),
+    (0.381, 3.77, 2.69, 0.33),
 ]
 
 params_nve = [
-    (0.62, 4.25, -2.98, 5.43),
-    (0.50, 3.99, -0.45, 2.74),
-    (0.38, 3.77, 2.75, -1.32),
+    (0.625, 4.25, -2.98, 6.86),
+    (0.498, 3.99, -0.45, 3.90),
+    (0.381, 3.77, 2.75, 0.23),
 ]
 
 # %%
@@ -306,6 +306,7 @@ for integrator in ['npt','nve'][:1]:
             N = np.arange(0, 400)
             G = acnt.r_pol_g0(N, *params) 
             Nc = N[np.argmax(G)]
+            print(np.max(G))
             mask = (N < 1.75*Nc)
 
             # plot aCNT
@@ -327,7 +328,7 @@ plt.savefig('../../results/figs/mW-barriers-npt-nve.pdf', dpi=300, bbox_inches='
 # ## 6c. TIP4P/ICE barrier
 
 # %%
-acnt.dmu = dmu = 0.3228
+acnt.dmu = dmu = 0.319
 params = (4.32, -9.89, 16.02)
 
 fig, ax = plt.subplots(figsize=(3.375, 3.375/4*3))
@@ -385,7 +386,7 @@ line_weights = [1, 2, 1]
 zorders = [2, 1, 0]
 
 
-# Collect US and Seeding 2.0 barriers
+# Collect US and VUS barriers
 Ts = np.array([215.1, 225.0, 235.0])
 J0s = np.array([4.8e39, 4.8e39, 1.2e40])
 J0 = 5e39
